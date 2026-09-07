@@ -9,9 +9,15 @@ try {
   const manifest = JSON.parse(readFileSync(manifestPath, "utf-8"));
   const template = readFileSync(templatePath, "utf-8");
 
-  const entry = manifest["src/client.tsx"];
+  // Find the main entry - could be various keys
+  const entryKeys = Object.keys(manifest);
+  const entry =
+    manifest["src/client.tsx"] ||
+    manifest["node_modules/@tanstack/react-start/dist/plugin/default-entry/client.tsx"] ||
+    manifest[entryKeys.find((k) => k.includes("client.tsx")) || ""];
+
   if (!entry) {
-    console.error("Entry not found in manifest");
+    console.error("Entry not found in manifest. Available keys:", entryKeys);
     process.exit(1);
   }
 
