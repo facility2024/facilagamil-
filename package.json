@@ -5,14 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "build": "vite build && node scripts/generate-shell.mjs",
-    "build:dev": "vite build --mode development && node scripts/generate-shell.mjs",
+    "build": "vite build",
+    "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "start": "node scripts/easypanel-server.mjs",
-    "easypanel:build": "bun install --frozen-lockfile && bun run build",
-    "easypanel:start": "node scripts/easypanel-server.mjs"
+    "start": "node dist/server/index.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
