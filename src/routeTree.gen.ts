@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LayoutRouteImport } from './routes/_layout'
 import { Route as EmailMarketingRouteImport } from './routes/email-marketing'
 import { Route as EmailMarketingStatsRouteImport } from './routes/email-marketing-stats'
+import { Route as HealthRouteImport } from './routes/health'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ApiContactRouteImport } from './routes/api/contact'
 import { Route as ApiEmailMarketingRouteImport } from './routes/api/email-marketing'
@@ -30,6 +31,11 @@ const EmailMarketingRoute = EmailMarketingRouteImport.update({
 const EmailMarketingStatsRoute = EmailMarketingStatsRouteImport.update({
   id: '/email-marketing-stats',
   path: '/email-marketing-stats',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HealthRoute = HealthRouteImport.update({
+  id: '/health',
+  path: '/health',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -62,6 +68,7 @@ export interface FileRoutesByFullPath {
   '/': typeof LayoutRoute
   '/email-marketing': typeof EmailMarketingRoute
   '/email-marketing-stats': typeof EmailMarketingStatsRoute
+  '/health': typeof HealthRoute
   '/login': typeof LoginRoute
   '/api/contact': typeof ApiContactRoute
   '/api/email-marketing': typeof ApiEmailMarketingRoute
@@ -72,6 +79,7 @@ export interface FileRoutesByTo {
   '/': typeof LayoutRoute
   '/email-marketing': typeof EmailMarketingRoute
   '/email-marketing-stats': typeof EmailMarketingStatsRoute
+  '/health': typeof HealthRoute
   '/login': typeof LoginRoute
   '/api/contact': typeof ApiContactRoute
   '/api/email-marketing': typeof ApiEmailMarketingRoute
@@ -83,6 +91,7 @@ export interface FileRoutesById {
   '/_layout': typeof LayoutRoute
   '/email-marketing': typeof EmailMarketingRoute
   '/email-marketing-stats': typeof EmailMarketingStatsRoute
+  '/health': typeof HealthRoute
   '/login': typeof LoginRoute
   '/api/contact': typeof ApiContactRoute
   '/api/email-marketing': typeof ApiEmailMarketingRoute
@@ -95,6 +104,7 @@ export interface FileRouteTypes {
     | '/'
     | '/email-marketing'
     | '/email-marketing-stats'
+    | '/health'
     | '/login'
     | '/api/contact'
     | '/api/email-marketing'
@@ -105,6 +115,7 @@ export interface FileRouteTypes {
     | '/'
     | '/email-marketing'
     | '/email-marketing-stats'
+    | '/health'
     | '/login'
     | '/api/contact'
     | '/api/email-marketing'
@@ -115,6 +126,7 @@ export interface FileRouteTypes {
     | '/_layout'
     | '/email-marketing'
     | '/email-marketing-stats'
+    | '/health'
     | '/login'
     | '/api/contact'
     | '/api/email-marketing'
@@ -126,6 +138,7 @@ export interface RootRouteChildren {
   LayoutRoute: typeof LayoutRoute
   EmailMarketingRoute: typeof EmailMarketingRoute
   EmailMarketingStatsRoute: typeof EmailMarketingStatsRoute
+  HealthRoute: typeof HealthRoute
   LoginRoute: typeof LoginRoute
   ApiContactRoute: typeof ApiContactRoute
   ApiEmailMarketingRoute: typeof ApiEmailMarketingRoute
@@ -154,6 +167,13 @@ declare module '@tanstack/react-router' {
       path: '/email-marketing-stats'
       fullPath: '/email-marketing-stats'
       preLoaderRoute: typeof EmailMarketingStatsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/health': {
+      id: '/health'
+      path: '/health'
+      fullPath: '/health'
+      preLoaderRoute: typeof HealthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -198,6 +218,7 @@ const rootRouteChildren: RootRouteChildren = {
   LayoutRoute: LayoutRoute,
   EmailMarketingRoute: EmailMarketingRoute,
   EmailMarketingStatsRoute: EmailMarketingStatsRoute,
+  HealthRoute: HealthRoute,
   LoginRoute: LoginRoute,
   ApiContactRoute: ApiContactRoute,
   ApiEmailMarketingRoute: ApiEmailMarketingRoute,
