@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+
+# Build
+dist/
+.output/
+.vinxi/
+.tanstack/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# TypeScript
+*.tsbuildinfo
+
+# Route tree (auto-generated)
+src/routeTree.gen.ts
