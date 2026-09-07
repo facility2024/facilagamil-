@@ -26,5 +26,3 @@ Thumbs.db
 # TypeScript
 *.tsbuildinfo
 
-# Route tree (auto-generated)
-src/routeTree.gen.ts
