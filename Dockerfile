@@ -5,7 +5,7 @@ COPY package.json package-lock.json* bun.lock* ./
 RUN if [ -f package-lock.json ]; then npm ci --legacy-peer-deps; else npm install --legacy-peer-deps; fi
 
 COPY . .
-RUN npx vite build \
+RUN npm run build \
  && test -f dist/server/index.mjs \
  && echo "Build OK: dist/server/index.mjs existe"
 
