@@ -12,7 +12,7 @@
     "format": "prettier --write .",
     "start": "node scripts/easypanel-server.mjs",
     "easypanel:build": "bun install --frozen-lockfile && bun run build",
-    "easypanel:start": "node scripts/easypanel-server.mjs",
+    "easypanel:start": "node scripts/easypanel-server.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
