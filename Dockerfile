@@ -1,13 +1,17 @@
 FROM node:22-alpine AS builder
 WORKDIR /app
 
+ARG DEPLOY=v4-healthfix-2026-09-08
+
 COPY package.json package-lock.json* bun.lock* ./
 RUN if [ -f package-lock.json ]; then npm ci --legacy-peer-deps; else npm install --legacy-peer-deps; fi
 
 COPY . .
 RUN npm run build \
  && test -f dist/server/index.mjs \
- && echo "Build OK: dist/server/index.mjs existe"
+ && echo "Build OK: dist/server/index.mjs existe" \
+ && ls -la dist/client/ \
+ && ls -la dist/client/assets/ | head -5
 
 FROM node:22-alpine AS runner
 WORKDIR /app
