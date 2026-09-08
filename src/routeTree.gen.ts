@@ -9,7 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as LayoutRouteImport } from './routes/_layout'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as EmailMarketingRouteImport } from './routes/email-marketing'
 import { Route as EmailMarketingStatsRouteImport } from './routes/email-marketing-stats'
 import { Route as HealthRouteImport } from './routes/health'
@@ -19,8 +19,9 @@ import { Route as ApiEmailMarketingRouteImport } from './routes/api/email-market
 import { Route as ApiTrackRouteImport } from './routes/api/track'
 import { Route as ApiTrackStatsRouteImport } from './routes/api/track-stats'
 
-const LayoutRoute = LayoutRouteImport.update({
-  id: '/_layout',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EmailMarketingRoute = EmailMarketingRouteImport.update({
@@ -65,7 +66,7 @@ const ApiTrackStatsRoute = ApiTrackStatsRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof LayoutRoute
+  '/': typeof IndexRoute
   '/email-marketing': typeof EmailMarketingRoute
   '/email-marketing-stats': typeof EmailMarketingStatsRoute
   '/health': typeof HealthRoute
@@ -76,7 +77,7 @@ export interface FileRoutesByFullPath {
   '/api/track-stats': typeof ApiTrackStatsRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof LayoutRoute
+  '/': typeof IndexRoute
   '/email-marketing': typeof EmailMarketingRoute
   '/email-marketing-stats': typeof EmailMarketingStatsRoute
   '/health': typeof HealthRoute
@@ -88,7 +89,7 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/_layout': typeof LayoutRoute
+  '/': typeof IndexRoute
   '/email-marketing': typeof EmailMarketingRoute
   '/email-marketing-stats': typeof EmailMarketingStatsRoute
   '/health': typeof HealthRoute
@@ -123,7 +124,7 @@ export interface FileRouteTypes {
     | '/api/track-stats'
   id:
     | '__root__'
-    | '/_layout'
+    | '/'
     | '/email-marketing'
     | '/email-marketing-stats'
     | '/health'
@@ -135,7 +136,7 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  LayoutRoute: typeof LayoutRoute
+  IndexRoute: typeof IndexRoute
   EmailMarketingRoute: typeof EmailMarketingRoute
   EmailMarketingStatsRoute: typeof EmailMarketingStatsRoute
   HealthRoute: typeof HealthRoute
@@ -148,11 +149,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/_layout': {
-      id: '/_layout'
-      path: ''
+    '/': {
+      id: '/'
+      path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof LayoutRouteImport
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/email-marketing': {
@@ -215,7 +216,7 @@ declare module '@tanstack/react-router' {
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  LayoutRoute: LayoutRoute,
+  IndexRoute: IndexRoute,
   EmailMarketingRoute: EmailMarketingRoute,
   EmailMarketingStatsRoute: EmailMarketingStatsRoute,
   HealthRoute: HealthRoute,
