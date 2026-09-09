@@ -1,7 +1,8 @@
 FROM node:22-alpine AS builder
 WORKDIR /app
 
-ARG DEPLOY=v5-index-2026-09-08
+ARG DEPLOY=v6-gitsha-2026-09-09
+ARG GIT_SHA=unknown
 
 # O valor do ARG participa de um comando RUN real, então mudar o DEPLOY
 # quebra o cache do Docker e força o rebuild completo (npm ci + vite build).
@@ -10,9 +11,11 @@ RUN if [ -f package-lock.json ]; then npm ci --legacy-peer-deps; else npm instal
 
 COPY . .
 RUN echo "deploy=$DEPLOY" > .deploy-version \
+ && echo "git-sha=$GIT_SHA" > .git-sha \
+ && echo ">> BUILDING deploy=$DEPLOY git-sha=$GIT_SHA" \
  && npm run build \
  && test -f dist/server/index.mjs \
- && echo "Build OK: dist/server/index.mjs existe ($DEPLOY)" \
+ && echo "Build OK: dist/server/index.mjs existe ($DEPLOY / $GIT_SHA)" \
  && ls -la dist/client/ \
  && ls -la dist/client/assets/ | head -5
 
