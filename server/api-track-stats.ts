@@ -1,4 +1,4 @@
-import { defineEventHandler, createError } from "h3";
+import { defineEventHandler } from "h3";
 import { createClient } from "@supabase/supabase-js";
 
 function getSupabase() {
@@ -18,7 +18,9 @@ export default defineEventHandler(async () => {
       .order("sent_at", { ascending: false })
       .limit(50);
 
-    if (error) throw error;
+    if (error) {
+      return { error: error.message };
+    }
 
     const campaignsWithStats = await Promise.all(
       (campaigns || []).map(async (campaign) => {
@@ -49,6 +51,6 @@ export default defineEventHandler(async () => {
     return { campaigns: campaignsWithStats };
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : "Erro ao buscar estatisticas";
-    throw createError({ statusCode: 500, statusMessage: msg });
+    return { error: msg };
   }
 });
