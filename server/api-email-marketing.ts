@@ -34,6 +34,9 @@ function buildEmailHtml({
   trackId: string;
   trackingBase: string;
 }) {
+  const trackClick = (url: string) =>
+    `${trackingBase}/api/track?action=click&id=${trackId || ""}&url=${encodeURIComponent(url)}`;
+
   let html = `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">`;
 
   if (bannerUrl) {
@@ -48,16 +51,17 @@ function buildEmailHtml({
   }
 
   if (buttonText && buttonLink) {
-    html += `<div style="margin-top: 24px; text-align: center;"><a href="${buttonLink}" style="display: inline-block; background: linear-gradient(135deg, #6ea8fe, #8b7cf6); color: #fff; padding: 12px 32px; border-radius: 12px; text-decoration: none; font-weight: bold; font-size: 15px;">${buttonText}</a></div>`;
+    html += `<div style="margin-top: 24px; text-align: center;"><a href="${trackClick(buttonLink)}" style="display: inline-block; background: linear-gradient(135deg, #6ea8fe, #8b7cf6); color: #fff; padding: 12px 32px; border-radius: 12px; text-decoration: none; font-weight: bold; font-size: 15px;">${buttonText}</a></div>`;
   }
 
   if (youtubeUrl) {
-    html += `<div style="margin-top: 20px; text-align: center;"><a href="${youtubeUrl}" style="color: #ff0000; font-size: 14px; font-weight: bold;">&#9654; Assistir no YouTube</a></div>`;
+    html += `<div style="margin-top: 20px; text-align: center;"><a href="${trackClick(youtubeUrl)}" style="color: #ff0000; font-size: 14px; font-weight: bold;">&#9654; Assistir no YouTube</a></div>`;
   }
 
   if (whatsappNumber) {
     const cleanNumber = whatsappNumber.replace(/\D/g, "");
-    html += `<div style="margin-top: 16px; text-align: center;"><a href="https://wa.me/${cleanNumber}" style="display: inline-block; background: #25D366; color: #fff; padding: 10px 24px; border-radius: 10px; text-decoration: none; font-weight: bold; font-size: 14px;">Fale conosco no WhatsApp</a></div>`;
+    const waUrl = `https://wa.me/${cleanNumber}`;
+    html += `<div style="margin-top: 16px; text-align: center;"><a href="${trackClick(waUrl)}" style="display: inline-block; background: #25D366; color: #fff; padding: 10px 24px; border-radius: 10px; text-decoration: none; font-weight: bold; font-size: 14px;">Fale conosco no WhatsApp</a></div>`;
   }
 
   if (includeUnsubscribe) {
