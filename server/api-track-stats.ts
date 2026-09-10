@@ -1,4 +1,4 @@
-import { defineEventHandler } from "h3";
+import { defineEventHandler, setResponseStatus } from "h3";
 import { createClient } from "@supabase/supabase-js";
 
 function getSupabase() {
@@ -8,7 +8,7 @@ function getSupabase() {
   );
 }
 
-export default defineEventHandler(async () => {
+export default defineEventHandler(async (event) => {
   const supabase = getSupabase();
 
   try {
@@ -19,6 +19,7 @@ export default defineEventHandler(async () => {
       .limit(50);
 
     if (error) {
+      setResponseStatus(event, 500);
       return { error: error.message };
     }
 
@@ -51,6 +52,7 @@ export default defineEventHandler(async () => {
     return { campaigns: campaignsWithStats };
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : "Erro ao buscar estatisticas";
+    setResponseStatus(event, 500);
     return { error: msg };
   }
 });
