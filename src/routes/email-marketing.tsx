@@ -66,16 +66,34 @@ function EmailMarketingPage() {
   const [sending, setSending] = useState(false);
   const [result, setResult] = useState<{ ok: boolean; total: number } | null>(null);
   const [error, setError] = useState("");
+  const [totalSent, setTotalSent] = useState(0);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session) navigate({ to: "/login" });
     });
+    fetchCredits();
   }, [navigate]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
     navigate({ to: "/login" });
+  };
+
+  const fetchCredits = async () => {
+    try {
+      const res = await fetch("/api/track-stats");
+      const data = await res.json();
+      if (data.campaigns) {
+        const total = data.campaigns.reduce(
+          (sum: number, c: { total_recipients: number }) => sum + (c.total_recipients || 0),
+          0,
+        );
+        setTotalSent(total);
+      }
+    } catch {
+      // ignore
+    }
   };
 
   const recipientCount = recipients
@@ -123,6 +141,7 @@ function EmailMarketingPage() {
       setButtonLink("");
       setYoutubeUrl("");
       setWhatsappNumber("");
+      setTotalSent((prev) => prev + data.total);
     } catch {
       setError("Falha na conexao. Tente novamente.");
     } finally {
@@ -180,6 +199,17 @@ function EmailMarketingPage() {
             <p className="mt-2 text-sm text-slate-400">
               Envie emails personalizados para sua lista de contatos
             </p>
+            <div
+              className="mt-4 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold"
+              style={{ background: "#1e293b", border: "1px solid #334155" }}
+            >
+              <span className="text-slate-400">Creditos:</span>
+              <span style={{ color: totalSent > 2700 ? "#f87171" : "#8b7cf6" }}>
+                {totalSent.toLocaleString("pt-BR")}
+              </span>
+              <span className="text-slate-500">/</span>
+              <span className="text-slate-400">3.000</span>
+            </div>
           </div>
 
           {/* Alerts */}
