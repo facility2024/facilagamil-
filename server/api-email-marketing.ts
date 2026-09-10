@@ -235,7 +235,7 @@ export default defineEventHandler(async (event) => {
     return { error: "Maximo de 3.000 destinatarios por envio" };
   }
 
-  const trackingBase = process.env.SITE_URL || "";
+  const trackingBase = process.env.SITE_URL || "https://agencia-facilitagmail.nisqla.easypanel.host";
 
   let campaignId = "";
   try {

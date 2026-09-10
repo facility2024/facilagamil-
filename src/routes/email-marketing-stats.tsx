@@ -76,7 +76,7 @@ function EmailMarketingStatsPage() {
 
   return (
     <div className="min-h-screen" style={{ background: "#0f172a" }}>
-      <div className="mx-auto max-w-[900px] px-4 py-10">
+      <div className="mx-auto max-w-[1100px] px-4 py-10">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           {/* Header */}
           <div className="mb-8 flex items-center justify-between">
