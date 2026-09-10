@@ -16,30 +16,12 @@ import {
   BarChart3,
   LogOut,
   Settings,
-  Eye,
-  MousePointerClick,
-  RefreshCw,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase-client";
 
 export const Route = createFileRoute("/email-marketing")({
   component: EmailMarketingPage,
 });
-
-interface SendResult {
-  sent: number;
-  failed: number;
-  errors?: string[];
-}
-
-interface CampaignStat {
-  campaign_id: string;
-  subject: string;
-  sent_at: string;
-  total_recipients: number;
-  opens: number;
-  clicks: number;
-}
 
 const cardStyle = {
   background: "#1e293b",
@@ -82,17 +64,13 @@ function EmailMarketingPage() {
   const [whatsappNumber, setWhatsappNumber] = useState("");
   const [includeUnsubscribe, setIncludeUnsubscribe] = useState(true);
   const [sending, setSending] = useState(false);
-  const [result, setResult] = useState<SendResult | null>(null);
+  const [result, setResult] = useState<{ ok: boolean; total: number } | null>(null);
   const [error, setError] = useState("");
-
-  const [stats, setStats] = useState<CampaignStat[]>([]);
-  const [loadingStats, setLoadingStats] = useState(true);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session) navigate({ to: "/login" });
     });
-    fetchStats();
   }, [navigate]);
 
   const handleLogout = async () => {
@@ -104,19 +82,6 @@ function EmailMarketingPage() {
     .split(/[\n,;]+/)
     .map((e) => e.trim())
     .filter(Boolean).length;
-
-  const fetchStats = async () => {
-    setLoadingStats(true);
-    try {
-      const res = await fetch("/api/track-stats");
-      const data = await res.json();
-      if (data.campaigns) setStats(data.campaigns);
-    } catch {
-      // ignore
-    } finally {
-      setLoadingStats(false);
-    }
-  };
 
   const handleSend = async () => {
     setSending(true);
@@ -149,7 +114,15 @@ function EmailMarketingPage() {
       }
 
       setResult(data);
-      fetchStats();
+      setRecipients("");
+      setSubject("");
+      setMessage("");
+      setBannerUrl("");
+      setImageUrl("");
+      setButtonText("");
+      setButtonLink("");
+      setYoutubeUrl("");
+      setWhatsappNumber("");
     } catch {
       setError("Falha na conexao. Tente novamente.");
     } finally {
@@ -166,13 +139,17 @@ function EmailMarketingPage() {
             <div />
             <div className="flex items-center gap-3">
               <button
+                onClick={() => navigate({ to: "/email-marketing-stats" })}
+                className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold transition-all hover:scale-105"
+                style={{ background: "#1e293b", color: "#94a3b8", border: "1px solid #334155" }}
+              >
+                <BarChart3 size={14} />
+                Relatorio
+              </button>
+              <button
                 onClick={() => navigate({ to: "/settings" })}
                 className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold transition-all hover:scale-105"
-                style={{
-                  background: "#1e293b",
-                  color: "#94a3b8",
-                  border: "1px solid #334155",
-                }}
+                style={{ background: "#1e293b", color: "#94a3b8", border: "1px solid #334155" }}
               >
                 <Settings size={14} />
                 Configuracoes
@@ -180,11 +157,7 @@ function EmailMarketingPage() {
               <button
                 onClick={handleLogout}
                 className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold transition-all hover:scale-105"
-                style={{
-                  background: "#1e293b",
-                  color: "#f87171",
-                  border: "1px solid #7f1d1d",
-                }}
+                style={{ background: "#1e293b", color: "#f87171", border: "1px solid #7f1d1d" }}
               >
                 <LogOut size={14} />
                 Sair
@@ -220,16 +193,10 @@ function EmailMarketingPage() {
               <div className="flex items-start gap-3">
                 <CheckCircle2 className="mt-0.5 text-green-400" size={20} />
                 <div>
-                  <p className="font-semibold text-green-400">Envio concluido!</p>
+                  <p className="font-semibold text-green-400">Envio iniciado!</p>
                   <p className="text-sm text-slate-400">
-                    {result.sent} email(s) enviado(s)
-                    {result.failed > 0 && ` · ${result.failed} falha(s)`}
+                    {result.total} email(s) sendo enviado(s) em background.
                   </p>
-                  {result.errors && result.errors.length > 0 && (
-                    <p className="mt-1 text-xs text-red-400">
-                      Falhas: {result.errors.join(", ")}
-                    </p>
-                  )}
                 </div>
               </div>
             </motion.div>
@@ -530,71 +497,6 @@ function EmailMarketingPage() {
                 </>
               )}
             </motion.button>
-          </div>
-
-          {/* Estatisticas inline */}
-          <div className="mt-10">
-            <div className="mb-6 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div
-                  className="flex h-9 w-9 items-center justify-center rounded-xl"
-                  style={{ background: "linear-gradient(135deg, #6366f1, #8b5cf6)" }}
-                >
-                  <BarChart3 size={16} className="text-white" />
-                </div>
-                <h2 className="text-lg font-semibold text-white">Estatisticas</h2>
-              </div>
-              <button
-                onClick={fetchStats}
-                className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold transition-all hover:scale-105"
-                style={{ background: "#1e293b", color: "#94a3b8", border: "1px solid #334155" }}
-              >
-                <RefreshCw size={12} />
-                Atualizar
-              </button>
-            </div>
-
-            {loadingStats ? (
-              <div className="rounded-3xl p-8 text-center" style={cardStyle}>
-                <Loader2 size={24} className="mx-auto animate-spin text-slate-500" />
-                <p className="mt-2 text-sm text-slate-500">Carregando...</p>
-              </div>
-            ) : stats.length === 0 ? (
-              <div className="rounded-3xl p-8 text-center" style={cardStyle}>
-                <p className="text-sm text-slate-500">Nenhuma campanha enviada ainda.</p>
-              </div>
-            ) : (
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {stats.map((s) => {
-                  const openRate = s.total_recipients > 0 ? ((s.opens / s.total_recipients) * 100).toFixed(1) : "0";
-                  const clickRate = s.total_recipients > 0 ? ((s.clicks / s.total_recipients) * 100).toFixed(1) : "0";
-                  return (
-                    <div
-                      key={s.campaign_id}
-                      className="rounded-3xl p-5"
-                      style={cardStyle}
-                    >
-                      <h3 className="mb-3 truncate text-sm font-semibold text-white">
-                        {s.subject}
-                      </h3>
-                      <p className="mb-3 text-xs text-slate-500">
-                        {new Date(s.sent_at).toLocaleDateString("pt-BR")} · {s.total_recipients} destinatarios
-                      </p>
-                      <div className="flex gap-4">
-                        <div className="flex items-center gap-1.5">
-                          <Eye size={14} className="text-blue-400" />
-                          <span className="text-sm font-semibold text-white">{openRate}%</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <MousePointerClick size={14} className="text-purple-400" />
-                          <span className="text-sm font-semibold text-white">{clickRate}%</span>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
           </div>
         </motion.div>
       </div>

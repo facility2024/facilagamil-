@@ -69,6 +69,111 @@ function buildEmailHtml({
   return html;
 }
 
+async function sendCampaignInBackground({
+  campaignId,
+  recipientList,
+  subject,
+  message,
+  bannerUrl,
+  imageUrl,
+  buttonText,
+  buttonLink,
+  youtubeUrl,
+  whatsappNumber,
+  includeUnsubscribe,
+  smtpHost,
+  smtpPort,
+  smtpUser,
+  smtpPass,
+  smtpFromName,
+  trackingBase,
+}: {
+  campaignId: string;
+  recipientList: string[];
+  subject: string;
+  message: string;
+  bannerUrl?: string;
+  imageUrl?: string;
+  buttonText?: string;
+  buttonLink?: string;
+  youtubeUrl?: string;
+  whatsappNumber?: string;
+  includeUnsubscribe: boolean;
+  smtpHost: string;
+  smtpPort: number;
+  smtpUser: string;
+  smtpPass: string;
+  smtpFromName: string;
+  trackingBase: string;
+}) {
+  const supabase = getSupabase();
+
+  const transporter = nodemailer.createTransport({
+    host: smtpHost,
+    port: smtpPort,
+    secure: smtpPort === 465,
+    auth: { user: smtpUser, pass: smtpPass },
+    connectionTimeout: 10000,
+    greetingTimeout: 5000,
+  });
+
+  let sent = 0;
+  let failed = 0;
+
+  for (const email of recipientList) {
+    let trackId = "";
+    if (campaignId) {
+      try {
+        const { data } = await supabase
+          .from("email_tracks")
+          .insert({ campaign_id: campaignId, recipient_email: email })
+          .select("id")
+          .single();
+        if (data) trackId = data.id;
+      } catch {
+        // ignore
+      }
+    }
+
+    const trackPixel = trackId
+      ? `<img src="${trackingBase}/api/track?id=${trackId}" width="1" height="1" style="display:none;" alt="" />`
+      : "";
+
+    const html = buildEmailHtml({
+      message,
+      bannerUrl,
+      imageUrl,
+      buttonText,
+      buttonLink,
+      youtubeUrl,
+      whatsappNumber,
+      includeUnsubscribe,
+      trackPixel,
+      trackId,
+      trackingBase,
+    });
+
+    try {
+      await transporter.sendMail({
+        from: `"${smtpFromName}" <${smtpUser}>`,
+        to: email,
+        subject,
+        html,
+      });
+      sent++;
+    } catch {
+      failed++;
+    }
+  }
+
+  if (campaignId) {
+    await supabase
+      .from("email_campaigns")
+      .update({ total_recipients: sent, sent_count: sent, failed_count: failed })
+      .eq("id", campaignId);
+  }
+}
+
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
   const supabase = getSupabase();
@@ -160,71 +265,30 @@ export default defineEventHandler(async (event) => {
     console.error("CAMPAIGN_INSERT_EXCEPTION:", err);
   }
 
-  const transporter = nodemailer.createTransport({
-    host: smtpHost,
-    port: smtpPort,
-    secure: smtpPort === 465,
-    auth: { user: smtpUser, pass: smtpPass },
-    connectionTimeout: 10000,
-    greetingTimeout: 5000,
-  });
-
-  let sent = 0;
-  let failed = 0;
-  const errors: string[] = [];
-
-  for (const email of recipientList) {
-    let trackId = "";
-    if (campaignId) {
-      try {
-        const { data } = await supabase
-          .from("email_tracks")
-          .insert({ campaign_id: campaignId, recipient_email: email })
-          .select("id")
-          .single();
-        if (data) trackId = data.id;
-      } catch {
-        // ignore
-      }
-    }
-
-    const trackPixel = trackId
-      ? `<img src="${trackingBase}/api/track?id=${trackId}" width="1" height="1" style="display:none;" alt="" />`
-      : "";
-
-    const html = buildEmailHtml({
-      message,
-      bannerUrl,
-      imageUrl,
-      buttonText,
-      buttonLink,
-      youtubeUrl,
-      whatsappNumber,
-      includeUnsubscribe: includeUnsubscribe !== false,
-      trackPixel,
-      trackId,
-      trackingBase,
-    });
-
-    try {
-      await transporter.sendMail({
-        from: `"${smtpFromName}" <${smtpUser}>`,
-        to: email,
-        subject,
-        html,
-      });
-      sent++;
-    } catch (err: unknown) {
-      failed++;
-      const msg = err instanceof Error ? err.message : String(err);
-      errors.push(`${email}: ${msg}`);
-    }
-  }
+  // Return immediately, send emails in background
+  sendCampaignInBackground({
+    campaignId,
+    recipientList,
+    subject,
+    message,
+    bannerUrl,
+    imageUrl,
+    buttonText,
+    buttonLink,
+    youtubeUrl,
+    whatsappNumber,
+    includeUnsubscribe: includeUnsubscribe !== false,
+    smtpHost,
+    smtpPort,
+    smtpUser,
+    smtpPass,
+    smtpFromName,
+    trackingBase,
+  }).catch(() => {});
 
   return {
-    sent,
-    failed,
-    errors: errors.slice(0, 10),
+    ok: true,
+    total: recipientList.length,
     campaignId,
   };
 });
