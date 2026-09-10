@@ -89,10 +89,13 @@ export default defineEventHandler(async (event) => {
       .select("id")
       .single();
 
-    if (error) throw error;
-    campaignId = data.id;
-  } catch {
-    campaignId = "";
+    if (error) {
+      console.error("CAMPAIGN_INSERT_ERROR:", JSON.stringify(error));
+    } else {
+      campaignId = data.id;
+    }
+  } catch (err) {
+    console.error("CAMPAIGN_INSERT_EXCEPTION:", err);
   }
 
   const transporter = nodemailer.createTransport({
