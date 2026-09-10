@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS email_campaigns (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   subject TEXT NOT NULL,
   message TEXT NOT NULL,
+  banner_url TEXT,
   image_url TEXT,
   button_text TEXT,
   button_link TEXT,
@@ -57,6 +58,7 @@ ORDER BY c.sent_at DESC;
 -- Habilitar RLS (Row Level Security)
 ALTER TABLE email_campaigns ENABLE ROW LEVEL SECURITY;
 ALTER TABLE email_tracks ENABLE ROW LEVEL SECURITY;
+ALTER TABLE user_settings ENABLE ROW LEVEL SECURITY;
 
 -- Policies para service_role (acesso total via API server)
 CREATE POLICY "Service role can do everything on email_campaigns"
@@ -69,7 +71,24 @@ CREATE POLICY "Service role can do everything on email_tracks"
   USING (true)
   WITH CHECK (true);
 
+CREATE POLICY "Service role can do everything on user_settings"
+  ON user_settings FOR ALL
+  USING (true)
+  WITH CHECK (true);
+
 -- Index para performance
 CREATE INDEX IF NOT EXISTS idx_email_tracks_campaign ON email_tracks(campaign_id);
 CREATE INDEX IF NOT EXISTS idx_email_tracks_email ON email_tracks(recipient_email);
 CREATE INDEX IF NOT EXISTS idx_email_campaigns_sent ON email_campaigns(sent_at DESC);
+
+-- Tabela de configuracoes do usuario (SMTP)
+CREATE TABLE IF NOT EXISTS user_settings (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  smtp_host TEXT,
+  smtp_port TEXT DEFAULT '465',
+  smtp_user TEXT,
+  smtp_password TEXT,
+  smtp_from_name TEXT DEFAULT '',
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);

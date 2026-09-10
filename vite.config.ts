@@ -12,6 +12,7 @@ export default defineConfig({
       { route: "/api/email-marketing", handler: "./server/api-email-marketing.ts" },
       { route: "/api/track", handler: "./server/api-track.ts" },
       { route: "/api/track-stats", handler: "./server/api-track-stats.ts" },
+      { route: "/api/settings", handler: "./server/api-settings.ts" },
     ],
   },
   vite: {

@@ -1,4 +1,4 @@
-import { defineEventHandler, readBody, getQuery } from "h3";
+import { defineEventHandler, readBody } from "h3";
 import { createClient } from "@supabase/supabase-js";
 import nodemailer from "nodemailer";
 
@@ -11,20 +11,42 @@ function getSupabase() {
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
+  const supabase = getSupabase();
 
-  const smtpHost = process.env.SMTP_HOST;
-  const smtpPort = parseInt(process.env.SMTP_PORT || "465", 10);
-  const smtpUser = process.env.SMTP_USER;
-  const smtpPass = process.env.SMTP_PASSWORD;
+  // Load SMTP from user_settings table, fallback to env vars
+  let smtpHost = process.env.SMTP_HOST;
+  let smtpPort = parseInt(process.env.SMTP_PORT || "465", 10);
+  let smtpUser = process.env.SMTP_USER;
+  let smtpPass = process.env.SMTP_PASSWORD;
+  let smtpFromName = "Facility Marketing";
+
+  try {
+    const { data: settings } = await supabase
+      .from("user_settings")
+      .select("*")
+      .limit(1)
+      .single();
+
+    if (settings) {
+      if (settings.smtp_host) smtpHost = settings.smtp_host;
+      if (settings.smtp_port) smtpPort = parseInt(settings.smtp_port, 10);
+      if (settings.smtp_user) smtpUser = settings.smtp_user;
+      if (settings.smtp_password) smtpPass = settings.smtp_password;
+      if (settings.smtp_from_name) smtpFromName = settings.smtp_from_name;
+    }
+  } catch {
+    // use env vars
+  }
 
   if (!smtpHost || !smtpUser || !smtpPass) {
-    return { error: "Servico de email nao configurado. Contate o administrador." };
+    return { error: "Servico de email nao configurado. Vaya a Configuracoes e insira suas credenciais SMTP." };
   }
 
   const {
     recipients,
     subject,
     message,
+    bannerUrl,
     imageUrl,
     buttonText,
     buttonLink,
@@ -36,8 +58,6 @@ export default defineEventHandler(async (event) => {
   if (!recipients || !subject || !message) {
     return { error: "Assunto e mensagem sao obrigatorios" };
   }
-
-  const supabase = getSupabase();
 
   const recipientList = recipients
     .split(/[\n,;]+/)
@@ -57,6 +77,7 @@ export default defineEventHandler(async (event) => {
       .insert({
         subject,
         message,
+        banner_url: bannerUrl || null,
         image_url: imageUrl || null,
         button_text: buttonText || null,
         button_link: buttonLink || null,
@@ -106,8 +127,20 @@ export default defineEventHandler(async (event) => {
 
     let html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
-        <div style="padding: 24px; background: #ffffff; border-radius: 12px; border: 1px solid #eee;">
-          <div style="white-space: pre-wrap; font-size: 15px; line-height: 1.6;">${message}</div>
+    `;
+
+    // Banner at the top
+    if (bannerUrl) {
+      html += `
+        <div style="text-align: center; margin-bottom: 20px;">
+          <img src="${bannerUrl}" alt="Banner" style="width: 100%; max-width: 600px; border-radius: 12px 12px 0 0; display: block;" />
+        </div>
+      `;
+    }
+
+    html += `
+      <div style="padding: 24px; background: #ffffff; border-radius: 12px; border: 1px solid #eee;">
+        <div style="white-space: pre-wrap; font-size: 15px; line-height: 1.6;">${message}</div>
     `;
 
     if (imageUrl) {
@@ -156,7 +189,7 @@ export default defineEventHandler(async (event) => {
 
     try {
       await transporter.sendMail({
-        from: `"Facility Marketing" <${smtpUser}>`,
+        from: `"${smtpFromName}" <${smtpUser}>`,
         to: email,
         subject,
         html,

@@ -14,6 +14,7 @@ import { Route as EmailMarketingRouteImport } from './routes/email-marketing'
 import { Route as EmailMarketingStatsRouteImport } from './routes/email-marketing-stats'
 import { Route as HealthRouteImport } from './routes/health'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ApiContactRouteImport } from './routes/api/contact'
 import { Route as ApiEmailMarketingRouteImport } from './routes/api/email-marketing'
 import { Route as ApiTrackRouteImport } from './routes/api/track'
@@ -44,6 +45,11 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiContactRoute = ApiContactRouteImport.update({
   id: '/api/contact',
   path: '/api/contact',
@@ -71,6 +77,7 @@ export interface FileRoutesByFullPath {
   '/email-marketing-stats': typeof EmailMarketingStatsRoute
   '/health': typeof HealthRoute
   '/login': typeof LoginRoute
+  '/settings': typeof SettingsRoute
   '/api/contact': typeof ApiContactRoute
   '/api/email-marketing': typeof ApiEmailMarketingRoute
   '/api/track': typeof ApiTrackRoute
@@ -82,6 +89,7 @@ export interface FileRoutesByTo {
   '/email-marketing-stats': typeof EmailMarketingStatsRoute
   '/health': typeof HealthRoute
   '/login': typeof LoginRoute
+  '/settings': typeof SettingsRoute
   '/api/contact': typeof ApiContactRoute
   '/api/email-marketing': typeof ApiEmailMarketingRoute
   '/api/track': typeof ApiTrackRoute
@@ -94,6 +102,7 @@ export interface FileRoutesById {
   '/email-marketing-stats': typeof EmailMarketingStatsRoute
   '/health': typeof HealthRoute
   '/login': typeof LoginRoute
+  '/settings': typeof SettingsRoute
   '/api/contact': typeof ApiContactRoute
   '/api/email-marketing': typeof ApiEmailMarketingRoute
   '/api/track': typeof ApiTrackRoute
@@ -107,6 +116,7 @@ export interface FileRouteTypes {
     | '/email-marketing-stats'
     | '/health'
     | '/login'
+    | '/settings'
     | '/api/contact'
     | '/api/email-marketing'
     | '/api/track'
@@ -118,6 +128,7 @@ export interface FileRouteTypes {
     | '/email-marketing-stats'
     | '/health'
     | '/login'
+    | '/settings'
     | '/api/contact'
     | '/api/email-marketing'
     | '/api/track'
@@ -129,6 +140,7 @@ export interface FileRouteTypes {
     | '/email-marketing-stats'
     | '/health'
     | '/login'
+    | '/settings'
     | '/api/contact'
     | '/api/email-marketing'
     | '/api/track'
@@ -141,6 +153,7 @@ export interface RootRouteChildren {
   EmailMarketingStatsRoute: typeof EmailMarketingStatsRoute
   HealthRoute: typeof HealthRoute
   LoginRoute: typeof LoginRoute
+  SettingsRoute: typeof SettingsRoute
   ApiContactRoute: typeof ApiContactRoute
   ApiEmailMarketingRoute: typeof ApiEmailMarketingRoute
   ApiTrackRoute: typeof ApiTrackRoute
@@ -184,6 +197,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/contact': {
       id: '/api/contact'
       path: '/api/contact'
@@ -221,6 +241,7 @@ const rootRouteChildren: RootRouteChildren = {
   EmailMarketingStatsRoute: EmailMarketingStatsRoute,
   HealthRoute: HealthRoute,
   LoginRoute: LoginRoute,
+  SettingsRoute: SettingsRoute,
   ApiContactRoute: ApiContactRoute,
   ApiEmailMarketingRoute: ApiEmailMarketingRoute,
   ApiTrackRoute: ApiTrackRoute,
