@@ -13,6 +13,7 @@ export default defineConfig({
       { route: "/api/track", handler: "./server/api-track.ts" },
       { route: "/api/track-stats", handler: "./server/api-track-stats.ts" },
       { route: "/api/settings", handler: "./server/api-settings.ts" },
+      { route: "/api/debug", handler: "./server/api-debug.ts" },
     ],
   },
   vite: {

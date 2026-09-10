@@ -258,16 +258,12 @@ export default defineEventHandler(async (event) => {
 
     if (error) {
       console.error("CAMPAIGN_INSERT_ERROR:", JSON.stringify(error));
-      setResponseStatus(event, 500);
-      return { error: `Erro ao salvar campanha: ${error.message}` };
     } else {
       campaignId = data.id;
     }
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
-    console.error("CAMPAIGN_INSERT_EXCEPTION:", err);
-    setResponseStatus(event, 500);
-    return { error: `Excecao ao salvar campanha: ${msg}` };
+    console.error("CAMPAIGN_INSERT_EXCEPTION:", msg);
   }
 
   // Return immediately, send emails in background
