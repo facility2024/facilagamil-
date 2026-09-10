@@ -7,7 +7,7 @@ React 19 SPA on TanStack Router + TanStack Start, bundled through `@lovable.dev/
 ## Commands
 
 - `npm run dev` — Vite dev server (TanStack Start). Requires `.env` vars to match the app's specific env names (see below).
-- `npm run build` — `vite build` then `node scripts/generate-shell.mjs`. The shell step rewrites `dist/client/index.html` to point at hashed assets from the Vite manifest; **do not skip it**. Docker build asserts `dist/server/index.mjs` exists.
+- `npm run build` — `vite build` then `node scripts/generate-shell.mjs`. The shell step rewrites `dist/client/index.html` **and** patches the Nitro SSR renderer template (`dist/server/_chunks/*.mjs`) to point at hashed assets from the Vite manifest; **do not skip it**. Docker build asserts `dist/server/index.mjs` exists.
 - `npm run start` — SPA static server (`scripts/easypanel-server.mjs`) serving `dist/client`. This is NOT the same as the Docker CMD, which runs the Nitro output (`node dist/server/index.mjs`, PORT=3000, HOST=0.0.0.0). `npm start` only works after `npm run build`.
 - `npm run lint` — `eslint .` **currently fails** (ESLint 9 has no `eslint.config.*` in the repo).
 - `npm run format` — `prettier --write .`
