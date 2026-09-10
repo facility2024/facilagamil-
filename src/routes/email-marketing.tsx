@@ -308,12 +308,28 @@ function EmailMarketingPage() {
               <CardHeader
                 icon={<Image size={16} className="text-white" />}
                 iconBg="linear-gradient(135deg, #a855f7, #6366f1)"
-                title="Banner e Imagem"
+                title="Imagens"
               />
               <div className="space-y-4">
                 <div>
                   <label className="mb-1.5 block text-sm font-medium text-slate-300">
-                    Banner principal (topo do email)
+                    Imagem principal (topo do email)
+                  </label>
+                  <input
+                    type="url"
+                    value={imageUrl}
+                    onChange={(e) => setImageUrl(e.target.value)}
+                    placeholder="https://exemplo.com/imagem.jpg"
+                    className="w-full rounded-xl border px-4 py-3 text-sm placeholder:italic focus:outline-none focus:ring-2"
+                    style={inputStyle}
+                  />
+                  <p className="mt-1 text-xs text-slate-500">
+                    Imagem grande que aparece no topo do email.
+                  </p>
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium text-slate-300">
+                    Banner do conteudo
                   </label>
                   <input
                     type="url"
@@ -324,21 +340,8 @@ function EmailMarketingPage() {
                     style={inputStyle}
                   />
                   <p className="mt-1 text-xs text-slate-500">
-                    Imagem que aparece no topo do email marketing.
+                    Imagem que aparece dentro do conteudo do email.
                   </p>
-                </div>
-                <div>
-                  <label className="mb-1.5 block text-sm font-medium text-slate-300">
-                    Imagem do corpo
-                  </label>
-                  <input
-                    type="url"
-                    value={imageUrl}
-                    onChange={(e) => setImageUrl(e.target.value)}
-                    placeholder="https://exemplo.com/imagem.jpg"
-                    className="w-full rounded-xl border px-4 py-3 text-sm placeholder:italic focus:outline-none focus:ring-2"
-                    style={inputStyle}
-                  />
                 </div>
               </div>
             </motion.div>

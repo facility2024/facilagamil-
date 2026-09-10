@@ -39,15 +39,15 @@ function buildEmailHtml({
 
   let html = `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">`;
 
-  if (bannerUrl) {
-    html += `<div style="text-align: center; margin-bottom: 20px;"><img src="${bannerUrl}" alt="Banner" style="width: 100%; max-width: 600px; border-radius: 12px 12px 0 0; display: block;" /></div>`;
+  if (imageUrl) {
+    html += `<div style="text-align: center; margin-bottom: 20px;"><img src="${imageUrl}" alt="Imagem" style="width: 100%; max-width: 600px; border-radius: 12px 12px 0 0; display: block;" /></div>`;
   }
 
   html += `<div style="padding: 24px; background: #ffffff; border-radius: 12px; border: 1px solid #eee;">`;
   html += `<div style="white-space: pre-wrap; font-size: 15px; line-height: 1.6;">${message}</div>`;
 
-  if (imageUrl) {
-    html += `<div style="margin-top: 20px; text-align: center;"><img src="${imageUrl}" alt="Imagem" style="max-width: 100%; border-radius: 8px;" /></div>`;
+  if (bannerUrl) {
+    html += `<div style="margin-top: 20px; text-align: center;"><img src="${bannerUrl}" alt="Banner" style="max-width: 100%; border-radius: 8px;" /></div>`;
   }
 
   if (buttonText && buttonLink) {
